@@ -1,5 +1,10 @@
 {
   "values": [
-    "splinecart:track_ties"
+    "sporkcart:track_ties",
+    "sporkcart:switch_ties",
+    "sporkcart:shuttle_ties",
+    "sporkcart:invisible_ties",
+    "sporkcart:invisible_switch_ties",
+    "sporkcart:invisible_shuttle_ties"
   ]
 }
