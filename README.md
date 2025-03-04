@@ -1,7 +1,5 @@
 # Sporkcart
 
-# THIS GITHUB REPOSITORY IS NOT UPDATED, IM WORKING ON IT I PROMISE
-
 The last minecart mod you'll ever need!
 
 I love Splinecart and Forkcart adds some nice features too, but they don't work together which is annoying, so I thought, why not combine them! So that's what I did, it's all the normal Splinecart features with added bugfixed and QOL changes from Forkcart, as well as some new Track Ties. I also went in and added invisible variants for everything as well. Check out a complete list of features below!
