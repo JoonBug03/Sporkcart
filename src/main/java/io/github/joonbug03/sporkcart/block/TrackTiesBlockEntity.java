@@ -5,6 +5,7 @@ import io.github.joonbug03.sporkcart.TrackType;
 import io.github.joonbug03.sporkcart.item.TrackItem;
 import io.github.joonbug03.sporkcart.util.Pose;
 import io.github.joonbug03.sporkcart.util.SUtil;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
@@ -24,12 +25,15 @@ import org.joml.Vector3d;
 public class TrackTiesBlockEntity extends BlockEntity {
     public float clientTime = 0;
 
-    private TrackType nextType = TrackType.DEFAULT;
-    private TrackType prevType = TrackType.DEFAULT;
+    TrackType nextType = TrackType.DEFAULT;
+    TrackType nextType2 = TrackType.DEFAULT;
+    TrackType prevType = TrackType.DEFAULT;
+    TrackType prevType2 = TrackType.DEFAULT;
 
-
-    private BlockPos next;
-    private BlockPos prev;
+    BlockPos next;
+    BlockPos prev;
+    BlockPos next2;
+    BlockPos prev2;
     private Pose pose;
     private int hasCartTicks = 0;
 
@@ -87,9 +91,66 @@ public class TrackTiesBlockEntity extends BlockEntity {
             }
             var nextE = next();
             if (nextE != null) {
-                nextE.prev = getPos();
-                if (type != null) {
-                    nextE.prevType = type;
+                if(nextE instanceof MergeTiesBlockEntity mergeTies) {
+                    if (mergeTies.prev() == null) {
+                        mergeTies.prev = getPos();
+                        if (type != null) {
+                            mergeTies.prevType = type;
+                        }
+                    } else if (mergeTies.prev2() == null) {
+                        mergeTies.prev2 = getPos();
+                        if (type != null) {
+                            mergeTies.prevType2 = type;
+                        }
+                    }
+                } else {
+                    nextE.prev = getPos();
+                    if (type != null) {
+                        nextE.prevType = type;
+                    }
+                }
+                nextE.sync();
+                nextE.markDirty();
+
+            }
+        }
+            sync();
+            markDirty();
+    }
+
+    public void setNext2(@Nullable BlockPos pos, @Nullable TrackType type) {
+        if (pos == null) {
+            var oldNextE = next();
+            this.next2 = null;
+            if (oldNextE != null) {
+                oldNextE.prev = null;
+                oldNextE.sync();
+                oldNextE.markDirty();
+            }
+        } else {
+            this.next2 = pos;
+            if (type != null) {
+                this.nextType2 = type;
+            }
+            var nextE = next();
+            if (nextE != null) {
+                if (nextE instanceof MergeTiesBlockEntity mergeTies) {
+                    if (mergeTies.prev() == null) {
+                        mergeTies.prev = getPos();
+                        if(type != null) {
+                            mergeTies.prevType = type;
+                        }
+                    } else if (mergeTies.prev2() == null) {
+                        mergeTies.prev2 = getPos();
+                        if(type != null) {
+                            mergeTies.prevType2 = type;
+                        }
+                    }
+                } else {
+                    nextE.prev = getPos();
+                    if (type != null) {
+                        nextE.prevType = type;
+                    }
                 }
                 nextE.sync();
                 nextE.markDirty();
@@ -108,6 +169,14 @@ public class TrackTiesBlockEntity extends BlockEntity {
         return of(this.getWorld(), this.prev);
     }
 
+    public @Nullable TrackTiesBlockEntity prev2() {
+        return of(this.getWorld(), this.prev2);
+    }
+
+    public @Nullable TrackTiesBlockEntity next2() {
+        return of(this.getWorld(), this.next);
+    }
+
     public @Nullable BlockPos nextPos() {
         return next;
     }
@@ -119,9 +188,15 @@ public class TrackTiesBlockEntity extends BlockEntity {
     public TrackType nextType() {
         return this.nextType;
     }
+    public TrackType nextType2() {
+        return this.nextType2;
+    }
 
     public TrackType prevType() {
         return this.prevType;
+    }
+    public TrackType prevType2() {
+        return this.prevType2;
     }
 
     public Pose pose() {
@@ -150,22 +225,69 @@ public class TrackTiesBlockEntity extends BlockEntity {
         if (this.prev != null) {
             this.dropTrack(this.prevType);
         }
+        if (this.prev2 != null) {
+            this.dropTrack(this.prevType2);
+        }
         if (this.next != null) {
             this.dropTrack(this.nextType);
         }
+        if (this.next2 != null) {
+            this.dropTrack(this.nextType2);
+        }
 
         var prevE = prev();
-        if (prevE != null) {
+        var prevE2 = prev2();
+        if (prevE != null && (prevE.getCachedState().isOf(Sporkcart.SPLIT_TIES) || prevE.getCachedState().isOf(Sporkcart.INVISIBLE_SPLIT_TIES) ) && this == prevE.next2()) {
+            prevE.next2 = null;
+            prevE.sync();
+            prevE.markDirty();
+        } else if (prevE != null && (prevE.getCachedState().isOf(Sporkcart.SPLIT_TIES) || prevE.getCachedState().isOf(Sporkcart.INVISIBLE_SPLIT_TIES) ) && this == prevE.next() && prevE.next2() != null) {
+            prevE.next = prevE.next2;
+            prevE.next2 = null;
+            prevE.sync();
+            prevE.markDirty();
+        } else if (prevE != null && prevE2 != null) {
+            prevE.next = null;
+            prevE2.next = null;
+            prevE.sync();
+            prevE.markDirty();
+            prevE2.sync();
+            prevE2.markDirty();
+        } else if (prevE != null) {
             prevE.next = null;
             prevE.sync();
             prevE.markDirty();
         }
+
         var nextE = next();
-        if (nextE != null) {
+        var nextE2 = next2();
+        if (nextE != null && (nextE.getCachedState().isOf(Sporkcart.MERGE_TIES) || nextE.getCachedState().isOf(Sporkcart.INVISIBLE_MERGE_TIES)) && this == nextE.prev2()) {
+            nextE.prev2 = null;
+            nextE.sync();
+            nextE.markDirty();
+        } else if (nextE != null && (nextE.getCachedState().isOf(Sporkcart.MERGE_TIES) || nextE.getCachedState().isOf(Sporkcart.INVISIBLE_MERGE_TIES)) && this == nextE.prev() && nextE.prev2() != null) {
+            nextE.prev = nextE.prev2;
+            nextE.prev2 = null;
+            nextE.sync();
+            nextE.markDirty();
+        } else if (nextE != null && nextE2 != null) {
+            nextE.prev = null;
+            nextE2.prev = null;
+            nextE.sync();
+            nextE.markDirty();
+            nextE2.sync();
+            nextE2.markDirty();
+        } else if (nextE != null) {
             nextE.prev = null;
             nextE.sync();
             nextE.markDirty();
         }
+
+        /*if (nextE2 != null) {
+            nextE2.prev = null;
+            nextE2.sync();
+            nextE2.markDirty();
+        }*/
     }
 
     @Override
@@ -174,9 +296,13 @@ public class TrackTiesBlockEntity extends BlockEntity {
 
         this.prev = SUtil.getBlockPos(nbt, "prev");
         this.next = SUtil.getBlockPos(nbt, "next");
+        this.prev2 = SUtil.getBlockPos(nbt, "prev2");
+        this.next2 = SUtil.getBlockPos(nbt, "next2");
 
         this.prevType = TrackType.read(nbt.getInt("prev_id"));
         this.nextType = TrackType.read(nbt.getInt("next_id"));
+        this.prevType2 = TrackType.read(nbt.getInt("prev_id2"));
+        this.nextType2 = TrackType.read(nbt.getInt("next_id2"));
 
         this.power = nbt.getInt("power");
     }
@@ -187,9 +313,13 @@ public class TrackTiesBlockEntity extends BlockEntity {
 
         SUtil.putBlockPos(nbt, this.prev, "prev");
         SUtil.putBlockPos(nbt, this.next, "next");
+        SUtil.putBlockPos(nbt, this.prev2, "prev2");
+        SUtil.putBlockPos(nbt, this.next2, "next2");
 
         nbt.putInt("prev_id", this.prevType.write());
         nbt.putInt("next_id", this.nextType.write());
+        nbt.putInt("prev_id2", this.prevType2.write());
+        nbt.putInt("next_id2", this.nextType2.write());
 
         nbt.putInt("power", this.power);
     }
@@ -233,4 +363,6 @@ public class TrackTiesBlockEntity extends BlockEntity {
             world.updateComparators(pos, getCachedState().getBlock());
         }
     }
+
+
 }

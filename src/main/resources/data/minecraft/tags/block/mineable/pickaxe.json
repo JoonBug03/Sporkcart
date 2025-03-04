@@ -1,10 +1,12 @@
 {
   "values": [
     "sporkcart:track_ties",
-    "sporkcart:switch_ties",
     "sporkcart:shuttle_ties",
+    "sporkcart:split_ties",
+    "sporkcart:merge_ties",
     "sporkcart:invisible_ties",
-    "sporkcart:invisible_switch_ties",
-    "sporkcart:invisible_shuttle_ties"
+    "sporkcart:invisible_shuttle_ties",
+    "sporkcart:invisible_split_ties",
+    "sporkcart:invisible_merge_ties"
   ]
 }

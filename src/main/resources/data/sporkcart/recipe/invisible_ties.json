@@ -3,19 +3,16 @@
   "category": "misc",
   "key": {
     "A": {
-      "item": "minecraft:stick"
+      "item": "minecraft:phantom_membrane"
     },
     "B": {
-      "tag": "minecraft:wooden_slabs"
-    },
-    "C": {
-      "item": "minecraft:phantom_membrane"
+      "item": "sporkcart:track_ties"
     }
   },
   "pattern": [
-    "BCB",
+    "BBB",
     "BAB",
-    "BCB"
+    "BBB"
   ],
   "result": {
     "count": 8,

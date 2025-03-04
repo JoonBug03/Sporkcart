@@ -21,6 +21,9 @@ public enum TrackType {
             (p, t, col, v) -> col.set(SUtil.REDSTONE_COLOR_LUT[p])
     ),
     STATION(3, MotionModifier.STATION_MODIFIER, null),
+
+
+
     INVISIBLE(0, MotionModifier.FRICTION, null
     ),
     INVISIBLE_CHAIN_DRIVE(1,
@@ -28,11 +31,7 @@ public enum TrackType {
             (p, t, col, v) -> v[0] = t * 0.05f
     ),
     INVISIBLE_MAGNETIC(2,
-            (m, g, p) -> {
-                double speed = (p / 15.0) * TrackFollowerEntity.MAGNETIC_SPEED_FACTOR;
-                m = (m * TrackFollowerEntity.FRICTION);
-                return m + ((speed - m) * TrackFollowerEntity.MAGNETIC_ACCEL * (1.0 - g));
-            },
+            MotionModifier.MAGNETIC_MODIFIER,
             (p, t, col, v) -> col.set(SUtil.REDSTONE_COLOR_LUT[p])
     ),
     INVISIBLE_STATION(3, MotionModifier.STATION_MODIFIER, null
@@ -69,10 +68,16 @@ public enum TrackType {
         MotionModifier STATION_MODIFIER = (m, g, p) -> {
             if (p > 0) {
                 double speed = 0.01 * p;
-                return Math.max(m * TrackFollowerEntity.FRICTION, speed);
+                return speed;
             } else {
                 return 0; // Stop the minecart if there's no power
             }
+        };
+
+        MotionModifier MAGNETIC_MODIFIER = (m, g, p) -> {
+            double speed = (p / 15.0) * TrackFollowerEntity.MAGNETIC_SPEED_FACTOR;
+            m = (m * TrackFollowerEntity.FRICTION);
+            return m + ((speed - m) * TrackFollowerEntity.MAGNETIC_ACCEL * (1.0 - g));
         };
         double calculate(double motion, double grade, int redstonePower);
     }

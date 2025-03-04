@@ -1,12 +1,21 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    "sporkcart:magnetic_track",
-    "minecraft:phantom_membrane"
+  "key": {
+    "A": {
+      "item": "minecraft:phantom_membrane"
+    },
+    "B": {
+      "item": "sporkcart:magnetic_track"
+    }
+  },
+  "pattern": [
+    "BBB",
+    "BAB",
+    "BBB"
   ],
   "result": {
-    "count": 4,
+    "count": 8,
     "id": "sporkcart:invisible_magnetic_track"
   }
 }

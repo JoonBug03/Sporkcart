@@ -3,25 +3,19 @@
   "category": "misc",
   "key": {
     "A": {
-      "item": "minecraft:activator_rail"
+      "item": "minecraft:phantom_membrane"
     },
     "B": {
-      "item": "minecraft:iron_block"
-    },
-    "C": {
-      "item": "minecraft:chain"
-    },
-    "D": {
-      "item": "minecraft:phantom_membrane"
+      "item": "sporkcart:chain_drive_track"
     }
   },
   "pattern": [
-    " B ",
-    "CAC",
-    "DBD"
+    "BBB",
+    "BAB",
+    "BBB"
   ],
   "result": {
-    "count": 4,
+    "count": 8,
     "id": "sporkcart:invisible_chain_drive_track"
   }
 }

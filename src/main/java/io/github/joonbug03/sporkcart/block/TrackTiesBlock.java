@@ -217,6 +217,11 @@ public class TrackTiesBlock extends FacingBlock implements BlockEntityProvider {
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        if(this instanceof SplitTiesBlock) {
+            return new SplitTiesBlockEntity(pos, state);
+        } else if(this instanceof MergeTiesBlock) {
+            return new MergeTiesBlockEntity(pos, state);
+        }
         return new TrackTiesBlockEntity(pos, state);
     }
 

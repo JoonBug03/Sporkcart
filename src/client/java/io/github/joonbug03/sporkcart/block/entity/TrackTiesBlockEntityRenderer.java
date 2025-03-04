@@ -2,6 +2,7 @@ package io.github.joonbug03.sporkcart.block.entity;
 
 import io.github.joonbug03.sporkcart.Sporkcart;
 import io.github.joonbug03.sporkcart.SporkcartClient;
+import io.github.joonbug03.sporkcart.TrackType;
 import io.github.joonbug03.sporkcart.block.TrackTiesBlockEntity;
 import io.github.joonbug03.sporkcart.util.Pose;
 import net.minecraft.block.BlockState;
@@ -21,6 +22,8 @@ import org.joml.Matrix3d;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
+import static com.mojang.text2speech.Narrator.LOGGER;
+
 public class TrackTiesBlockEntityRenderer implements BlockEntityRenderer<TrackTiesBlockEntity> {
     public static final int WHITE = 0xFFFFFFFF;
     public static final Vector3f WHITEF = new Vector3f(1, 1, 1);
@@ -33,7 +36,7 @@ public class TrackTiesBlockEntityRenderer implements BlockEntityRenderer<TrackTi
 
     @Override
     public void render(TrackTiesBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        if(entity.getCachedState().isOf(Sporkcart.INVISIBLE_TIES) || entity.getCachedState().isOf(Sporkcart.INVISIBLE_SHUTTLE_TIES) || entity.getCachedState().isOf(Sporkcart.INVISIBLE_SWITCH_TIES)) {
+        if(entity.getCachedState().isOf(Sporkcart.INVISIBLE_TIES) || entity.getCachedState().isOf(Sporkcart.INVISIBLE_SHUTTLE_TIES) || entity.getCachedState().isOf(Sporkcart.INVISIBLE_SPLIT_TIES) || entity.getCachedState().isOf(Sporkcart.INVISIBLE_MERGE_TIES)) {
             MinecraftClient client = MinecraftClient.getInstance();
             if(client != null && client.player != null) {
 
@@ -43,7 +46,9 @@ public class TrackTiesBlockEntityRenderer implements BlockEntityRenderer<TrackTi
                         client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_MAGNETIC_TRACK) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_MAGNETIC_TRACK) ||
                         client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_STATION_TRACK) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_STATION_TRACK) ||
                         client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_SHUTTLE_TIES.asItem()) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_SHUTTLE_TIES.asItem()) ||
-                        client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_SWITCH_TIES.asItem()) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_SWITCH_TIES.asItem());
+                        client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_SPLIT_TIES.asItem()) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_SPLIT_TIES.asItem()) ||
+                        client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_MERGE_TIES.asItem()) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_MERGE_TIES.asItem());
+
 
                 if(holdingInvisibleItem) {
 
@@ -73,16 +78,21 @@ public class TrackTiesBlockEntityRenderer implements BlockEntityRenderer<TrackTi
         entity.clientTime += tickDelta;
 
         var trackType = entity.nextType();
-        if(trackType == trackType.INVISIBLE || trackType == trackType.INVISIBLE_MAGNETIC || trackType == trackType.INVISIBLE_CHAIN_DRIVE || trackType == trackType.INVISIBLE_STATION) {
+        if (trackType == null) {
+            LOGGER.warn("Track type is null for entity at {}", entity.getPos());
+            return;
+        }
+        if(trackType == TrackType.INVISIBLE || trackType == TrackType.INVISIBLE_MAGNETIC || trackType == TrackType.INVISIBLE_CHAIN_DRIVE || trackType == TrackType.INVISIBLE_STATION) {
             MinecraftClient client = MinecraftClient.getInstance();
             if(client != null && client.player != null) {
                 boolean holdingInvisibleItem = client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_TRACK) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_TRACK) ||
-                client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_TIES.asItem()) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_TIES.asItem()) ||
+                        client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_TIES.asItem()) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_TIES.asItem()) ||
                         client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_CHAIN_DRIVE_TRACK) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_CHAIN_DRIVE_TRACK) ||
                         client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_MAGNETIC_TRACK) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_MAGNETIC_TRACK) ||
                         client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_STATION_TRACK) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_STATION_TRACK) ||
                         client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_SHUTTLE_TIES.asItem()) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_SHUTTLE_TIES.asItem()) ||
-                        client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_SWITCH_TIES.asItem()) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_SWITCH_TIES.asItem());
+                        client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_SPLIT_TIES.asItem()) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_SPLIT_TIES.asItem()) ||
+                        client.player.getStackInHand(Hand.MAIN_HAND).isOf(Sporkcart.INVISIBLE_MERGE_TIES.asItem()) || client.player.getStackInHand(Hand.OFF_HAND).isOf(Sporkcart.INVISIBLE_MERGE_TIES.asItem());
 
                 if(!holdingInvisibleItem) {
                     return;
@@ -101,8 +111,12 @@ public class TrackTiesBlockEntityRenderer implements BlockEntityRenderer<TrackTi
         }
 
         var buffer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(getTexture()));
+
         boolean reinitBuffer = false;
+
         var nextE = entity.next();
+        var nextE2 = entity.next2();
+
         if (nextE != null) {
             var end = nextE.pose();
             var world = entity.getWorld();
@@ -111,8 +125,8 @@ public class TrackTiesBlockEntityRenderer implements BlockEntityRenderer<TrackTi
 
             matrices.translate(-pos.getX(), -pos.getY(), -pos.getZ());
 
-            float u0 = trackType.textureU * 0.25f;
-            float u1 = u0 + 0.25f;
+            float u0 = trackType.textureU * 0.0625f;
+            float u1 = u0 + 0.0625f;
 
             int segs = SporkcartClient.CFG_TRACK_RESOLUTION.get() * Math.max((int) start.translation().distance(end.translation()), 2);
             var origin = new Vector3d(start.translation());
@@ -133,7 +147,7 @@ public class TrackTiesBlockEntityRenderer implements BlockEntityRenderer<TrackTi
 
                 float[] olVOffset = {0};
                 Vector3f olColor = new Vector3f(WHITEF);
-                int power = Math.max(entity.power(), nextE.power());
+                int power = nextE.power();
                 trackType.overlay.calculateEffects(power, entity.clientTime, olColor, olVOffset);
 
                 for (int i = 0; i < segs; i++) {
@@ -146,9 +160,50 @@ public class TrackTiesBlockEntityRenderer implements BlockEntityRenderer<TrackTi
 
             matrices.pop();
         }
+        var buffer2 = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(getTexture()));
+        if (nextE2 != null) {
+            var end = nextE2.pose();
+            var world = entity.getWorld();
+
+            matrices.push();
+            matrices.translate(-pos.getX(), -pos.getY(), -pos.getZ());
+
+            float u0 = trackType.textureU * 0.0625f;
+            float u1 = u0 + 0.0625f;
+
+            int segs = SporkcartClient.CFG_TRACK_RESOLUTION.get() * Math.max((int) start.translation().distance(end.translation()), 2);
+            var origin = new Vector3d(start.translation());
+            var basis = new Matrix3d(start.basis());
+            var grad = new Vector3d(0, 0, 1).mul(start.basis());
+            double[] totalDist = {0};
+
+            // Render the base track for nextE2
+            for (int i = 0; i < segs; i++) {
+                double t0 = (double) i / segs;
+                double t1 = (double) (i + 1) / segs;
+                renderPart(world, matrices.peek(), buffer2, start, end, u0, u1, 0, WHITEF, t0, t1, totalDist, origin, basis, grad, overlay);
+            }
+
+            // Render the overlay for nextE2 (if applicable)
+            if (trackType.overlay != null) {
+                var olBuffer2 = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(getTrackOverlayTexture()));
+                float[] olVOffset = {0};
+                Vector3f olColor = new Vector3f(WHITEF);
+                int power = nextE2.power();
+                trackType.overlay.calculateEffects(power, entity.clientTime, olColor, olVOffset);
+
+                for (int i = 0; i < segs; i++) {
+                    double t0 = (double) i / segs;
+                    double t1 = (double) (i + 1) / segs;
+                    renderPart(world, matrices.peek(), olBuffer2, start, end, u0, u1, olVOffset[0], olColor, t0, t1, totalDist, origin, basis, grad, overlay);
+                }
+            }
+
+            matrices.pop();
+        }
 
         var prevE = entity.prev();
-        if ((prevE == null) ^ (nextE == null)) {
+        if ((prevE == null) ^ (nextE == null || nextE2 == null)) {
             if (reinitBuffer) {
                 buffer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(getTexture()));
             }
@@ -158,7 +213,7 @@ public class TrackTiesBlockEntityRenderer implements BlockEntityRenderer<TrackTi
             float v0 = 1;
             float v1 = 0.5f;
 
-            if (nextE == null) {
+            if (nextE == null || nextE2 == null) {
                 z0 = 0;
                 z1 = 0.5f;
                 v0 = 0.5f;
@@ -181,11 +236,11 @@ public class TrackTiesBlockEntityRenderer implements BlockEntityRenderer<TrackTi
 
             matrices.translate(0, -0.4375, 0);
 
-            buffer.vertex(entry, 0.5f, 0, z0).color(WHITE).texture(0.25f, v0).overlay(overlay).light(light).normal(entry, 0, 1, 0);
+            buffer.vertex(entry, 0.5f, 0, z0).color(WHITE).texture(0.0625f, v0).overlay(overlay).light(light).normal(entry, 0, 1, 0);
             buffer.vertex(entry, -0.5f, 0, z0).color(WHITE).texture(0, v0).overlay(overlay).light(light).normal(entry, 0, 1, 0);
 
             buffer.vertex(entry, -0.5f, 0, z1).color(WHITE).texture(0, v1).overlay(overlay).light(light).normal(entry, 0, 1, 0);
-            buffer.vertex(entry, 0.5f, 0, z1).color(WHITE).texture(0.25f, v1).overlay(overlay).light(light).normal(entry, 0, 1, 0);
+            buffer.vertex(entry, 0.5f, 0, z1).color(WHITE).texture(0.0625f, v1).overlay(overlay).light(light).normal(entry, 0, 1, 0);
 
             matrices.pop();
         }
@@ -274,4 +329,5 @@ public class TrackTiesBlockEntityRenderer implements BlockEntityRenderer<TrackTi
         buffer.vertex(entry, point).color(color.x(), color.y(), color.z(), 1).texture(u0, v1).overlay(overlay)
                 .light(light1).normal(entry, (float) norm1.x(), (float) norm1.y(), (float) norm1.z());
     }
+
 }

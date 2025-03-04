@@ -34,11 +34,13 @@ public class SporkcartClient implements ClientModInitializer {
 		}
 
 		BlockRenderLayerMap.INSTANCE.putBlock(Sporkcart.TRACK_TIES, RenderLayer.getCutout());
-		BlockRenderLayerMap.INSTANCE.putBlock(Sporkcart.SWITCH_TIES, RenderLayer.getCutout());
 		BlockRenderLayerMap.INSTANCE.putBlock(Sporkcart.SHUTTLE_TIES, RenderLayer.getCutout());
+		BlockRenderLayerMap.INSTANCE.putBlock(Sporkcart.SPLIT_TIES, RenderLayer.getCutout());
+		BlockRenderLayerMap.INSTANCE.putBlock(Sporkcart.MERGE_TIES, RenderLayer.getCutout());
 		BlockRenderLayerMap.INSTANCE.putBlock(Sporkcart.INVISIBLE_TIES, RenderLayer.getCutout());
-		BlockRenderLayerMap.INSTANCE.putBlock(Sporkcart.INVISIBLE_SWITCH_TIES, RenderLayer.getCutout());
 		BlockRenderLayerMap.INSTANCE.putBlock(Sporkcart.INVISIBLE_SHUTTLE_TIES, RenderLayer.getCutout());
+		BlockRenderLayerMap.INSTANCE.putBlock(Sporkcart.INVISIBLE_SPLIT_TIES, RenderLayer.getCutout());
+		BlockRenderLayerMap.INSTANCE.putBlock(Sporkcart.INVISIBLE_MERGE_TIES, RenderLayer.getCutout());
 
 
 		BlockEntityRendererFactories.register(Sporkcart.TRACK_TIES_BE, TrackTiesBlockEntityRenderer::new);

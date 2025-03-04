@@ -1,9 +1,13 @@
 package io.github.joonbug03.sporkcart.mixin;
 
 import io.github.joonbug03.sporkcart.Sporkcart;
-import io.github.joonbug03.sporkcart.block.TrackTiesBlockEntity;
+import io.github.joonbug03.sporkcart.block.*;
 import io.github.joonbug03.sporkcart.entity.TrackFollowerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
@@ -15,8 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public class EntityMixin {
-    @Inject(method = "setPosition(DDD)V",
-            at = @At("TAIL"))
+    @Inject(method = "setPosition(DDD)V", at = @At("TAIL"))
     private void sporkcart$getOnTrackIfNecessary(double x, double y, double z, CallbackInfo info) {
         var self = (Entity)(Object)this;
         var world = self.getWorld();
@@ -25,7 +28,18 @@ public class EntityMixin {
         }
 
         var start = self.getBlockPos();
-        if (world.getBlockEntity(start) instanceof TrackTiesBlockEntity tie) {
+        if (world.getBlockEntity(start) instanceof SplitTiesBlockEntity splitTies) {
+            var endE = splitTies.next();
+            if(splitTies.getCachedState().get(SplitTiesBlock.SPLITED)) {
+                endE = splitTies.next2();
+            }
+            if (endE != null) {
+                var end = endE.getPos();
+                var follower = new TrackFollowerEntity(world, self.getPos(), start, end, self.getVelocity());
+                world.spawnEntity(follower);
+                self.startRiding(follower, true);
+            }
+        } else if (world.getBlockEntity(start) instanceof TrackTiesBlockEntity tie) {
             var endE = tie.next();
             if (endE != null) {
                 var end = endE.getPos();

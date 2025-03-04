@@ -1,9 +1,6 @@
 package io.github.joonbug03.sporkcart;
 
-import io.github.joonbug03.sporkcart.block.ShuttleTiesBlock;
-import io.github.joonbug03.sporkcart.block.SwitchTiesBlock;
-import io.github.joonbug03.sporkcart.block.TrackTiesBlock;
-import io.github.joonbug03.sporkcart.block.TrackTiesBlockEntity;
+import io.github.joonbug03.sporkcart.block.*;
 import io.github.joonbug03.sporkcart.component.OriginComponent;
 import io.github.joonbug03.sporkcart.entity.TrackFollowerEntity;
 import io.github.joonbug03.sporkcart.item.TrackItem;
@@ -41,24 +38,17 @@ public class Sporkcart implements ModInitializer {
 
 	public static final TrackTiesBlock TRACK_TIES = Registry.register(Registries.BLOCK, id("track_ties"),
 			new TrackTiesBlock(AbstractBlock.Settings.copy(Blocks.RAIL)));
-	public static final SwitchTiesBlock SWITCH_TIES = Registry.register(Registries.BLOCK, id("switch_ties"),
-			new SwitchTiesBlock(AbstractBlock.Settings.copy(Blocks.RAIL)));
 	public static final ShuttleTiesBlock SHUTTLE_TIES = Registry.register(Registries.BLOCK, id("shuttle_ties"),
 			new ShuttleTiesBlock(AbstractBlock.Settings.copy(Blocks.RAIL)));
-	public static final ShuttleTiesBlock SPLIT_TIES = Registry.register(Registries.BLOCK, id("split_ties"),
-			new ShuttleTiesBlock(AbstractBlock.Settings.copy(Blocks.RAIL)));
+	public static final SplitTiesBlock SPLIT_TIES = Registry.register(Registries.BLOCK, id("split_ties"),
+			new SplitTiesBlock(AbstractBlock.Settings.copy(Blocks.RAIL)));
+	public static final MergeTiesBlock MERGE_TIES = Registry.register(Registries.BLOCK, id("merge_ties"),
+			new MergeTiesBlock(AbstractBlock.Settings.copy(Blocks.RAIL)));
 
 
 
 	public static final TrackTiesBlock INVISIBLE_TIES = Registry.register(Registries.BLOCK, id("invisible_ties"),
 			new TrackTiesBlock(AbstractBlock.Settings.copy(Blocks.RAIL)) {
-				@Override
-				protected BlockRenderType getRenderType(BlockState state) {
-					return BlockRenderType.INVISIBLE;
-				}
-			});
-	public static final TrackTiesBlock INVISIBLE_SWITCH_TIES = Registry.register(Registries.BLOCK, id("invisible_switch_ties"),
-			new SwitchTiesBlock(AbstractBlock.Settings.copy(Blocks.RAIL)) {
 				@Override
 				protected BlockRenderType getRenderType(BlockState state) {
 					return BlockRenderType.INVISIBLE;
@@ -72,14 +62,22 @@ public class Sporkcart implements ModInitializer {
 				}
 			});
 	public static final TrackTiesBlock INVISIBLE_SPLIT_TIES = Registry.register(Registries.BLOCK, id("invisible_split_ties"),
-			new ShuttleTiesBlock(AbstractBlock.Settings.copy(Blocks.RAIL)) {
+			new SplitTiesBlock(AbstractBlock.Settings.copy(Blocks.RAIL)) {
 				@Override
 				protected BlockRenderType getRenderType(BlockState state) {
 					return BlockRenderType.INVISIBLE;
 				}
 			});
+	public static final TrackTiesBlock INVISIBLE_MERGE_TIES = Registry.register(Registries.BLOCK, id("invisible_merge_ties"),
+			new MergeTiesBlock(AbstractBlock.Settings.copy(Blocks.RAIL)) {
+				@Override
+				protected BlockRenderType getRenderType(BlockState state) {
+					return BlockRenderType.INVISIBLE;
+				}
+			});
+
 	public static final BlockEntityType<TrackTiesBlockEntity> TRACK_TIES_BE = Registry.register(Registries.BLOCK_ENTITY_TYPE, id("track_ties"),
-			BlockEntityType.Builder.create(TrackTiesBlockEntity::new, TRACK_TIES, SWITCH_TIES, SHUTTLE_TIES, SPLIT_TIES, INVISIBLE_TIES, INVISIBLE_SHUTTLE_TIES, INVISIBLE_SWITCH_TIES, INVISIBLE_SPLIT_TIES).build());
+			BlockEntityType.Builder.create(TrackTiesBlockEntity::new, TRACK_TIES, SHUTTLE_TIES, SPLIT_TIES, MERGE_TIES, INVISIBLE_TIES, INVISIBLE_SHUTTLE_TIES, INVISIBLE_SPLIT_TIES, INVISIBLE_MERGE_TIES).build());
 
 	public static final TrackItem TRACK = Registry.register(Registries.ITEM, id("track"),
 			new TrackItem(TrackType.DEFAULT, new Item.Settings().component(DataComponentTypes.LORE,
@@ -97,8 +95,6 @@ public class Sporkcart implements ModInitializer {
 			new TrackItem(TrackType.STATION, new Item.Settings().component(DataComponentTypes.LORE,
 					lore(Text.translatable("item.sporkcart.station_track.desc").formatted(Formatting.GRAY))
 			)));
-
-
 
 	public static final TrackItem INVISIBLE_TRACK = Registry.register(Registries.ITEM, id("invisible_track"),
 			new TrackItem(TrackType.INVISIBLE, new Item.Settings().component(DataComponentTypes.LORE,
@@ -143,17 +139,25 @@ public class Sporkcart implements ModInitializer {
 						.component(DataComponentTypes.LORE,
 								lore(Text.translatable("item.sporkcart.track_ties.desc").formatted(Formatting.GRAY))
 						)));
-		BlockItem switchTieItem = Registry.register(Registries.ITEM, id("switch_ties"),
-				new BlockItem(SWITCH_TIES, new Item.Settings()
-						.component(DataComponentTypes.LORE, lore(
-								Text.translatable("item.sporkcart.track_ties.desc").formatted(Formatting.GRAY),
-								Text.translatable("item.sporkcart.switch_ties.desc").formatted(Formatting.GRAY)
-						))));
 		BlockItem shuttleTieItem = Registry.register(Registries.ITEM, id("shuttle_ties"),
 				new BlockItem(SHUTTLE_TIES, new Item.Settings()
 						.component(DataComponentTypes.LORE, lore(
 								Text.translatable("item.sporkcart.track_ties.desc").formatted(Formatting.GRAY),
 								Text.translatable("item.sporkcart.shuttle_ties.desc").formatted(Formatting.GRAY)
+						))));
+		BlockItem splitTieItem = Registry.register(Registries.ITEM, id("split_ties"),
+				new BlockItem(SPLIT_TIES, new Item.Settings()
+						.component(DataComponentTypes.LORE, lore(
+								Text.translatable("item.sporkcart.track_ties.desc").formatted(Formatting.GRAY),
+								Text.translatable("item.sporkcart.split_ties.desc").formatted(Formatting.GRAY),
+								Text.translatable("item.sporkcart.safety.desc").formatted(Formatting.GRAY)
+						))));
+		BlockItem mergeTieItem = Registry.register(Registries.ITEM, id("merge_ties"),
+				new BlockItem(MERGE_TIES, new Item.Settings()
+						.component(DataComponentTypes.LORE, lore(
+								Text.translatable("item.sporkcart.track_ties.desc").formatted(Formatting.GRAY),
+								Text.translatable("item.sporkcart.merge_ties.desc").formatted(Formatting.GRAY),
+								Text.translatable("item.sporkcart.safety.desc").formatted(Formatting.GRAY)
 						))));
 
 
@@ -164,13 +168,6 @@ public class Sporkcart implements ModInitializer {
 								Text.translatable("item.sporkcart.track_ties.desc").formatted(Formatting.GRAY),
 								Text.translatable("item.sporkcart.invisible_ties.desc").formatted(Formatting.GRAY)
 						))));
-		BlockItem invisibleSwitchTieItem = Registry.register(Registries.ITEM, id("invisible_switch_ties"),
-				new BlockItem(INVISIBLE_SWITCH_TIES, new Item.Settings()
-						.component(DataComponentTypes.LORE, lore(
-								Text.translatable("item.sporkcart.track_ties.desc").formatted(Formatting.GRAY),
-								Text.translatable("item.sporkcart.switch_ties.desc").formatted(Formatting.GRAY),
-								Text.translatable("item.sporkcart.invisible_ties.desc").formatted(Formatting.GRAY)
-						))));
 		BlockItem invisibleShuttleTieItem = Registry.register(Registries.ITEM, id("invisible_shuttle_ties"),
 				new BlockItem(INVISIBLE_SHUTTLE_TIES, new Item.Settings()
 						.component(DataComponentTypes.LORE, lore(
@@ -178,14 +175,32 @@ public class Sporkcart implements ModInitializer {
 								Text.translatable("item.sporkcart.shuttle_ties.desc").formatted(Formatting.GRAY),
 								Text.translatable("item.sporkcart.invisible_ties.desc").formatted(Formatting.GRAY)
 						))));
+		BlockItem invisibleSplitTieItem = Registry.register(Registries.ITEM, id("invisible_split_ties"),
+				new BlockItem(INVISIBLE_SPLIT_TIES, new Item.Settings()
+						.component(DataComponentTypes.LORE, lore(
+								Text.translatable("item.sporkcart.track_ties.desc").formatted(Formatting.GRAY),
+								Text.translatable("item.sporkcart.split_ties.desc").formatted(Formatting.GRAY),
+								Text.translatable("item.sporkcart.invisible_ties.desc").formatted(Formatting.GRAY),
+								Text.translatable("item.sporkcart.safety.desc").formatted(Formatting.GRAY)
+						))));
+		BlockItem invisibleMergeTieItem = Registry.register(Registries.ITEM, id("invisible_merge_ties"),
+				new BlockItem(INVISIBLE_MERGE_TIES, new Item.Settings()
+						.component(DataComponentTypes.LORE, lore(
+								Text.translatable("item.sporkcart.track_ties.desc").formatted(Formatting.GRAY),
+								Text.translatable("item.sporkcart.merge_ties.desc").formatted(Formatting.GRAY),
+								Text.translatable("item.sporkcart.invisible_ties.desc").formatted(Formatting.GRAY),
+								Text.translatable("item.sporkcart.safety.desc").formatted(Formatting.GRAY)
+						))));
 
 		ItemGroupEvents.modifyEntriesEvent(MOD_GROUP).register(entries -> {
 			entries.add(tieItem.getDefaultStack());
-			entries.add(switchTieItem.getDefaultStack());
 			entries.add(shuttleTieItem.getDefaultStack());
+			entries.add(splitTieItem.getDefaultStack());
+			entries.add(mergeTieItem.getDefaultStack());
 			entries.add(invisibleTieItem.getDefaultStack());
-			entries.add(invisibleSwitchTieItem.getDefaultStack());
 			entries.add(invisibleShuttleTieItem.getDefaultStack());
+			entries.add(invisibleSplitTieItem.getDefaultStack());
+			entries.add(invisibleMergeTieItem.getDefaultStack());
 			entries.add(TRACK.getDefaultStack());
 			entries.add(CHAIN_DRIVE_TRACK.getDefaultStack());
 			entries.add(MAGNETIC_TRACK.getDefaultStack());
@@ -206,6 +221,9 @@ public class Sporkcart implements ModInitializer {
 	}
 	public static LoreComponent lore(Text lore, Text lore2, Text lore3) {
 		return new LoreComponent(List.of(lore, lore2, lore3));
+	}
+	public static LoreComponent lore(Text lore, Text lore2, Text lore3, Text lore4) {
+		return new LoreComponent(List.of(lore, lore2, lore3, lore4));
 	}
 
 	public static Identifier id(String path) {
