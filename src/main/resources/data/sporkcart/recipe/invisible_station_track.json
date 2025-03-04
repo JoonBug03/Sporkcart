@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "sporkcart:station_track",
+    "minecraft:phantom_membrane"
+  ],
+  "result": {
+    "count": 4,
+    "id": "sporkcart:invisible_station_track"
+  }
+}

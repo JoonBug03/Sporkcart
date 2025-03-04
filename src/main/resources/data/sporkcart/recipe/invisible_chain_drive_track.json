@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:activator_rail"
+    },
+    "B": {
+      "item": "minecraft:iron_block"
+    },
+    "C": {
+      "item": "minecraft:chain"
+    },
+    "D": {
+      "item": "minecraft:phantom_membrane"
+    }
+  },
+  "pattern": [
+    " B ",
+    "CAC",
+    "DBD"
+  ],
+  "result": {
+    "count": 4,
+    "id": "sporkcart:invisible_chain_drive_track"
+  }
+}
